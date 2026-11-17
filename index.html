@@ -37,7 +37,8 @@ input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--ctl
 input[type=range]::-moz-range-track{height:2px;background:var(--ctl-hi);border-radius:2px}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:14px;border-radius:3px;background:var(--knob);margin-top:-6px;border:0}
 input[type=range]::-moz-range-thumb{width:12px;height:14px;border-radius:3px;background:var(--knob);border:0}
-input[type=number],select{font:inherit;color:var(--fg);background:var(--ctl);border:0;border-radius:3px;height:22px;width:100%;padding:0 6px;box-sizing:border-box}
+input[type=number],input[type=text].hex,select{font:inherit;color:var(--fg);background:var(--ctl);border:0;border-radius:3px;height:22px;width:100%;padding:0 6px;box-sizing:border-box}
+input[type=text].hex{flex:1;min-width:0;text-transform:uppercase;letter-spacing:.5px}
 input[type=number]{text-align:right;-moz-appearance:textfield}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 select{background:var(--btn);color:var(--btn-fg);font-weight:600;cursor:pointer;-webkit-appearance:none;appearance:none;
@@ -202,7 +203,10 @@ DEF.forEach(([title,items],fi)=>{const f=document.createElement('div');f.classNa
     else if(it.t==='sel'){const s=document.createElement('select');s.id=id;s.setAttribute('aria-labelledby',id+'l');it.o.forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;s.appendChild(o)});s.onchange=()=>set(it.k,s.value);r.appendChild(s);
       binds.push(()=>{s.value=S[it.k];r.classList.toggle('dim',!!(it.dim&&it.dim()))})}
     else if(it.t==='color'){const w=document.createElement('div');w.className='col';const c=document.createElement('input');c.type='color';c.id=id;c.setAttribute('aria-labelledby',id+'l');c.oninput=()=>set(it.k,c.value);
-      const sw=document.createElement('div');sw.className='sw';SW.forEach(v=>{const x=document.createElement('button');x.style.background=v;x.title=v;x.setAttribute('aria-label',v);x.onclick=()=>set(it.k,v);sw.appendChild(x)});w.append(c,sw);r.appendChild(w);binds.push(()=>{c.value=S[it.k]})}
+      const hx=document.createElement('input');hx.type='text';hx.className='hex';hx.spellcheck=false;hx.maxLength=7;hx.placeholder='#000000';hx.setAttribute('aria-label','HEX');
+      const norm=v=>{v=String(v).trim().replace(/^#?/,'#');if(/^#[0-9a-fA-F]{3}$/.test(v))v='#'+v[1]+v[1]+v[2]+v[2]+v[3]+v[3];return /^#[0-9a-fA-F]{6}$/.test(v)?v.toLowerCase():null};
+      hx.oninput=()=>{const n=norm(hx.value);if(n)set(it.k,n)};hx.onchange=()=>{const n=norm(hx.value);if(n)set(it.k,n);else hx.value=S[it.k].toUpperCase()};
+      w.append(c,hx);r.appendChild(w);binds.push(()=>{c.value=S[it.k];if(document.activeElement!==hx)hx.value=S[it.k].toUpperCase()})}
   });
   if(fi>=3&&window.innerWidth<=760)f.classList.add('closed');
 });
